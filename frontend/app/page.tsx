@@ -20,6 +20,7 @@ import {
 import dynamic from "next/dynamic"
 
 const Hero3DModel = dynamic(() => import("@/components/Hero3DModel"), { ssr: false })
+const ButterflyBackground = dynamic(() => import("@/components/ButterflyBackground"), { ssr: false })
 
 const FEATURES = [
   {
@@ -120,142 +121,148 @@ export default function HomePage() {
             </div>
           </div>
           
-          <div className="relative w-full h-full flex justify-center items-center">
-            <div className="absolute inset-0 bg-brand-500/20 rounded-full blur-[100px] pointer-events-none opacity-50" />
+          <div className="relative w-full h-full flex justify-center items-center min-h-[500px] md:min-h-[750px]">
+            <div className="absolute inset-0 bg-brand-500/15 rounded-full blur-[120px] pointer-events-none opacity-60" />
+            <div className="absolute inset-0 bg-[#00E676]/10 rounded-full blur-[150px] pointer-events-none opacity-40" />
             <Hero3DModel />
           </div>
         </motion.div>
 
-        {/* Features Grid */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.7 }}
-          className="mb-24"
-        >
-          <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold mb-3">Built for Real Impact</h2>
-            <p className="text-ink-400 max-w-lg mx-auto">
-              Not just another EdTech demo. Every feature solves a real problem atomcamp instructors face daily.
-            </p>
-          </div>
+        {/* Post-hero sections with butterfly background */}
+        <div className="relative" id="butterfly-section">
+          <ButterflyBackground />
 
-          <div className="grid md:grid-cols-2 gap-4">
-            {FEATURES.map((f, i) => (
-              <motion.div
-                key={f.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 + i * 0.1 }}
-              >
-                <Card className="p-6 h-full hover:bg-white/[0.05] transition-colors group">
-                  <div className="flex items-start gap-4">
-                    <div className={`p-3 rounded-xl ${f.bg} ${f.color} ring-1 ${f.ring} shrink-0`}>
-                      <f.icon size={22} />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold mb-1 group-hover:text-brand-300 transition-colors">
-                        {f.title}
-                      </h3>
-                      <p className="text-sm text-ink-400 leading-relaxed">{f.desc}</p>
-                    </div>
-                  </div>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+          {/* Features Grid */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.7 }}
+            className="mb-24"
+          >
+            <div className="text-center mb-12">
+              <h2 className="text-2xl md:text-3xl font-bold mb-3">Built for Real Impact</h2>
+              <p className="text-ink-400 max-w-lg mx-auto">
+                Not just another EdTech demo. Every feature solves a real problem atomcamp instructors face daily.
+              </p>
+            </div>
 
-        {/* Two Paths */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.7 }}
-          className="mb-24"
-        >
-          <div className="text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-bold mb-3">Choose Your Portal</h2>
-            <p className="text-ink-400 max-w-lg mx-auto">
-              Two interfaces, one unified intelligence engine.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-5">
-            <Link href="/learner">
-              <Card className="p-8 hover:border-brand-500/30 transition-all group relative overflow-hidden h-full cursor-pointer gradient-border">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-brand-500/5 rounded-full blur-3xl pointer-events-none" />
-                <div className="flex items-center gap-4 mb-5">
-                  <div className="p-3 rounded-xl bg-brand-500/10 text-brand-400 ring-1 ring-brand-500/20">
-                    <BookOpen size={28} />
-                  </div>
-                  <h2 className="text-2xl font-semibold">Learner Onboarding</h2>
-                </div>
-                <p className="text-ink-400 mb-8 leading-relaxed text-sm">
-                  Answer 6 questions + a 12-question cognitive assessment. Get a visual learning path
-                  built from atomcamp's real catalog — with PKR pricing, milestones, and skill badges.
-                </p>
-                <div className="flex items-center text-sm font-medium text-brand-400 group-hover:gap-3 gap-2 transition-all">
-                  Start Your Journey <ArrowRight size={16} />
-                </div>
-              </Card>
-            </Link>
-
-            <Link href="/instructor">
-              <Card className="p-8 hover:border-rose-500/30 transition-all group relative overflow-hidden h-full cursor-pointer gradient-border">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-rose-500/5 rounded-full blur-3xl pointer-events-none" />
-                <div className="flex items-center gap-4 mb-5">
-                  <div className="p-3 rounded-xl bg-rose-500/10 text-rose-400 ring-1 ring-rose-500/20">
-                    <BarChart3 size={28} />
-                  </div>
-                  <h2 className="text-2xl font-semibold">Instructor Intelligence</h2>
-                </div>
-                <p className="text-ink-400 mb-8 leading-relaxed text-sm">
-                  Upload a cohort CSV. Our Random Forest model trains instantly and surfaces at-risk
-                  students with recommended interventions and downloadable reports.
-                </p>
-                <div className="flex items-center text-sm font-medium text-rose-400 group-hover:gap-3 gap-2 transition-all">
-                  Open Dashboard <ArrowRight size={16} />
-                </div>
-              </Card>
-            </Link>
-          </div>
-        </motion.div>
-
-        {/* Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.0, duration: 0.7 }}
-          className="mb-20"
-        >
-          <div className="glass p-8 md:p-10">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              {STATS.map((stat, i) => (
+            <div className="grid md:grid-cols-2 gap-4">
+              {FEATURES.map((f, i) => (
                 <motion.div
-                  key={stat.label}
+                  key={f.title}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 1.1 + i * 0.1 }}
-                  className="text-center"
+                  transition={{ delay: 0.6 + i * 0.1 }}
                 >
-                  <div className="text-3xl md:text-4xl font-bold gradient-text mb-1">
-                    {stat.value}{stat.suffix}
-                  </div>
-                  <div className="text-xs md:text-sm text-ink-500 font-medium uppercase tracking-wider">
-                    {stat.label}
-                  </div>
+                  <Card className="p-6 h-full hover:bg-white/[0.05] transition-colors group relative z-10">
+                    <div className="flex items-start gap-4">
+                      <div className={`p-3 rounded-xl ${f.bg} ${f.color} ring-1 ${f.ring} shrink-0`}>
+                        <f.icon size={22} />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold mb-1 group-hover:text-brand-300 transition-colors">
+                          {f.title}
+                        </h3>
+                        <p className="text-sm text-ink-400 leading-relaxed">{f.desc}</p>
+                      </div>
+                    </div>
+                  </Card>
                 </motion.div>
               ))}
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
 
-        {/* Footer */}
-        <div className="border-t border-white/[0.06] pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-ink-500 text-sm">
-          <p>Built for AUREX AI 2026 • AtomCamp Adaptive LMS</p>
-          <div className="flex items-center gap-2">
-            <ShieldCheck size={14} className="text-brand-400" />
-            <span>Offline ML • No external AI APIs</span>
+          {/* Two Paths */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.7 }}
+            className="mb-24"
+          >
+            <div className="text-center mb-10">
+              <h2 className="text-2xl md:text-3xl font-bold mb-3">Choose Your Portal</h2>
+              <p className="text-ink-400 max-w-lg mx-auto">
+                Two interfaces, one unified intelligence engine.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-5">
+              <Link href="/learner">
+                <Card className="p-8 hover:border-brand-500/30 transition-all group relative overflow-hidden h-full cursor-pointer gradient-border z-10">
+                  <div className="absolute top-0 right-0 w-40 h-40 bg-brand-500/5 rounded-full blur-3xl pointer-events-none" />
+                  <div className="flex items-center gap-4 mb-5">
+                    <div className="p-3 rounded-xl bg-brand-500/10 text-brand-400 ring-1 ring-brand-500/20">
+                      <BookOpen size={28} />
+                    </div>
+                    <h2 className="text-2xl font-semibold">Learner Onboarding</h2>
+                  </div>
+                  <p className="text-ink-400 mb-8 leading-relaxed text-sm">
+                    Answer 6 questions + a 12-question cognitive assessment. Get a visual learning path
+                    built from atomcamp's real catalog — with PKR pricing, milestones, and skill badges.
+                  </p>
+                  <div className="flex items-center text-sm font-medium text-brand-400 group-hover:gap-3 gap-2 transition-all">
+                    Start Your Journey <ArrowRight size={16} />
+                  </div>
+                </Card>
+              </Link>
+
+              <Link href="/instructor">
+                <Card className="p-8 hover:border-rose-500/30 transition-all group relative overflow-hidden h-full cursor-pointer gradient-border z-10">
+                  <div className="absolute top-0 right-0 w-40 h-40 bg-rose-500/5 rounded-full blur-3xl pointer-events-none" />
+                  <div className="flex items-center gap-4 mb-5">
+                    <div className="p-3 rounded-xl bg-rose-500/10 text-rose-400 ring-1 ring-rose-500/20">
+                      <BarChart3 size={28} />
+                    </div>
+                    <h2 className="text-2xl font-semibold">Instructor Intelligence</h2>
+                  </div>
+                  <p className="text-ink-400 mb-8 leading-relaxed text-sm">
+                    Upload a cohort CSV. Our Random Forest model trains instantly and surfaces at-risk
+                    students with recommended interventions and downloadable reports.
+                  </p>
+                  <div className="flex items-center text-sm font-medium text-rose-400 group-hover:gap-3 gap-2 transition-all">
+                    Open Dashboard <ArrowRight size={16} />
+                  </div>
+                </Card>
+              </Link>
+            </div>
+          </motion.div>
+
+          {/* Stats */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.0, duration: 0.7 }}
+            className="mb-20"
+          >
+            <div className="glass p-8 md:p-10 relative z-10">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                {STATS.map((stat, i) => (
+                  <motion.div
+                    key={stat.label}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.1 + i * 0.1 }}
+                    className="text-center"
+                  >
+                    <div className="text-3xl md:text-4xl font-bold gradient-text mb-1">
+                      {stat.value}{stat.suffix}
+                    </div>
+                    <div className="text-xs md:text-sm text-ink-500 font-medium uppercase tracking-wider">
+                      {stat.label}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Footer */}
+          <div className="border-t border-white/[0.06] pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-ink-500 text-sm relative z-10">
+            <p>Built for AUREX AI 2026 • AtomCamp Adaptive LMS</p>
+            <div className="flex items-center gap-2">
+              <ShieldCheck size={14} className="text-brand-400" />
+              <span>Offline ML • No external AI APIs</span>
+            </div>
           </div>
         </div>
       </div>
