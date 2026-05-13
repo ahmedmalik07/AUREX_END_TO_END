@@ -11,7 +11,7 @@ const ATOMCAMP_DARK = "#01011B"
 /* ─── Main Valkyrie Model ─── */
 function ValkyrieModel() {
   const groupRef = useRef<THREE.Group>(null)
-  const { scene } = useGLTF('/brick_valkyrie_machine.glb')
+  const { scene } = useGLTF('/techno_buddy.glb')
 
   const cloned = useMemo(() => scene.clone(), [scene])
 
@@ -216,5 +216,5 @@ export default function Hero3DModel() {
   )
 }
 
-useGLTF.preload('/brick_valkyrie_machine.glb')
+useGLTF.preload('/techno_buddy.glb')
 useGLTF.preload('/robot.glb')
