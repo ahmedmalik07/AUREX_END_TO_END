@@ -1,0 +1,15 @@
+{
+  "name": "aurex",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "kill-ports": "node scripts/kill-ports.js",
+    "install:all": "cd backend && python -m venv venv && venv\\Scripts\\pip install -r requirements.txt && cd ../frontend && npm install",
+    "dev": "npm run kill-ports && concurrently --names backend,frontend --prefix-colors cyan,green \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && venv\\Scripts\\python.exe -m uvicorn main:app --reload --port 8002",
+    "dev:frontend": "cd frontend && npm run dev"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

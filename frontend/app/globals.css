@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-ink-950 text-ink-300 antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-jakarta), sans-serif;
+    color: white;
+    font-weight: 700;
+  }
+
+  /* Fix native select dropdown colors — forces dark options on all browsers */
+  select option {
+    background-color: #111118;
+    color: #e2e8f0;
+  }
+
+  /* Firefox fix */
+  select {
+    color: #e2e8f0;
+    background-color: #111118;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-ink-900/60 backdrop-blur-xl border border-white/10 rounded-[20px] shadow-2xl;
+  }
+
+  .tilt-card {
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease;
+  }
+
+  .tilt-card:hover {
+    transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) scale(1.02);
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-brand-400 via-accent-400 to-brand-300 bg-clip-text text-transparent;
+  }
+
+  .gradient-border {
+    position: relative;
+  }
+
+  .gradient-border::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(34, 211, 238, 0.2), rgba(139, 92, 246, 0.1));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+/* Pitch mode overrides */
+.pitch-mode body {
+  font-size: 1.2rem;
+}
+
+.pitch-mode footer,
+.pitch-mode .hide-in-pitch {
+  display: none !important;
+}
+
+.pitch-mode .pitch-watermark {
+  display: block !important;
+}
+
+/* Subtle grid background */
+.grid-bg {
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+}

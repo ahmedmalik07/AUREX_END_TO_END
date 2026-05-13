@@ -1,0 +1,51 @@
+student_id,name,age,gender,background,goal,course_enrolled,assignment_avg,attendance_rate,engagement_hours,forum_posts,completed_assignments,total_assignments,drop_out
+1,Ayesha Khan,21,Male,non-technical,upskill,Data Analytics Bootcamp,48,0.82,13.9,2,9,10,0
+2,Bilal Ahmed,18,Male,technical,corporate,AI for O/A Levels,41,0.69,14.6,13,3,10,0
+3,Sanaullah,26,Female,technical,upskill,Data Analysis with Excel,67,0.54,4.0,10,1,10,1
+4,Fatima Noor,21,Female,non-technical,corporate,Automation with AI,91,0.33,9.7,3,6,10,1
+5,Hassan Raza,27,Female,non-technical,corporate,Data Analytics Bootcamp,85,0.35,13.6,9,1,10,0
+6,Zara Sheikh,21,Female,non-technical,freelance,Data Analytics Bootcamp,63,0.55,13.7,2,9,10,0
+7,Usman Ali,35,Female,technical,university-admission,Agentic AI Bootcamp,57,0.99,13.2,7,10,10,0
+8,Maryam Tariq,19,Male,technical,freelance,Agentic AI Bootcamp,57,0.35,18.3,10,3,10,0
+9,Ali Raza,30,Female,non-technical,upskill,Automation with AI,48,0.47,11.7,8,9,10,1
+10,Hira Khan,30,Female,technical,corporate,Agentic AI Bootcamp,45,0.83,17.4,4,10,10,0
+11,Omer Farooq,31,Female,non-technical,university-admission,AI for O/A Levels,69,0.67,19.5,0,10,10,0
+12,Khadija Bibi,35,Female,non-technical,career-switch,Automation with AI,67,0.41,1.1,8,8,10,0
+13,Fahad Mirza,34,Female,non-technical,corporate,AI for O/A Levels,52,0.41,15.5,0,9,10,1
+14,Rabia Ali,18,Male,non-technical,freelance,Data Analytics Bootcamp,43,0.47,11.8,2,1,10,1
+15,Saadullah,20,Female,technical,upskill,Data Analysis with Excel,70,0.96,4.1,13,3,10,0
+16,Nimra Hussain,24,Female,non-technical,freelance,Agentic AI Bootcamp,73,0.62,5.7,2,5,10,1
+17,Taimoor,35,Male,technical,career-switch,AI Bootcamp,85,0.74,5.3,1,5,10,1
+18,Sadia Malik,25,Male,non-technical,upskill,AI for O/A Levels,48,0.81,17.8,15,3,10,0
+19,Waqas,31,Male,technical,university-admission,Automation with AI,67,0.59,17.4,1,10,10,0
+20,Amina,21,Male,non-technical,career-switch,Data Analytics Bootcamp,52,0.43,9.5,13,2,10,1
+21,Junaid,25,Female,technical,university-admission,AI for O/A Levels,46,0.34,20.0,0,1,10,1
+22,Laiba,25,Male,non-technical,university-admission,Data Analytics Bootcamp,95,0.58,2.1,12,0,10,0
+23,Shahbaz,26,Female,non-technical,freelance,Agentic AI Bootcamp,84,0.97,19.9,15,2,10,0
+24,Mehwish,24,Female,technical,freelance,AI Bootcamp,43,0.71,10.6,5,0,10,0
+25,Asad,20,Female,technical,corporate,AI Bootcamp,83,0.9,8.7,7,9,10,0
+26,Noreen,20,Female,non-technical,freelance,Data Analytics Bootcamp,82,0.8,5.5,12,2,10,0
+27,Faisal,27,Female,technical,career-switch,Agentic AI Bootcamp,79,1.0,19.9,2,8,10,0
+28,Zainab,26,Male,non-technical,career-switch,Data Analytics Bootcamp,63,0.5,9.3,9,9,10,0
+29,Kashif,34,Male,non-technical,career-switch,Data Analytics Bootcamp,56,0.38,3.0,4,4,10,0
+30,Samar,24,Female,technical,freelance,AI for O/A Levels,71,0.48,18.3,1,1,10,0
+31,Babar,26,Male,non-technical,upskill,Data Analysis with Excel,56,0.41,9.4,13,8,10,1
+32,Tuba,20,Female,technical,corporate,AI Bootcamp,93,0.56,11.5,13,2,10,1
+33,Danish,29,Female,technical,freelance,Data Analytics Bootcamp,83,0.47,3.0,13,9,10,0
+34,Hafsa,25,Female,technical,university-admission,AI Bootcamp,51,0.82,7.3,13,10,10,0
+35,Imran,25,Male,technical,university-admission,AI Bootcamp,94,0.63,4.8,14,5,10,0
+36,Yusra,25,Male,technical,university-admission,Automation with AI,57,0.91,19.4,8,5,10,0
+37,Salman,30,Female,non-technical,career-switch,AI Bootcamp,56,0.42,19.3,8,0,10,1
+38,Anum,31,Male,non-technical,university-admission,AI for O/A Levels,72,0.38,18.1,6,4,10,1
+39,Rizwan,31,Male,technical,freelance,Agentic AI Bootcamp,44,0.96,18.5,10,10,10,0
+40,Iqra,27,Female,non-technical,freelance,Agentic AI Bootcamp,84,0.51,3.4,13,10,10,0
+41,Adeel,23,Female,non-technical,university-admission,AI for O/A Levels,93,0.3,6.5,13,9,10,0
+42,Farah,28,Female,non-technical,upskill,AI for O/A Levels,70,0.86,19.2,5,10,10,1
+43,Mudassir,34,Female,non-technical,career-switch,Data Analytics Bootcamp,83,0.52,16.3,4,0,10,1
+44,Palwasha,33,Female,technical,university-admission,Agentic AI Bootcamp,80,0.7,14.6,12,7,10,0
+45,Nabeel,22,Female,technical,career-switch,Agentic AI Bootcamp,54,0.42,19.2,14,0,10,1
+46,Shazia,21,Female,non-technical,corporate,AI for O/A Levels,78,0.52,15.3,14,9,10,0
+47,Haroon,34,Female,non-technical,upskill,Data Analysis with Excel,95,0.63,5.9,7,10,10,0
+48,Sundus,34,Female,technical,freelance,Agentic AI Bootcamp,44,0.8,5.5,10,5,10,0
+49,Jamil,20,Male,technical,university-admission,Data Analysis with Excel,49,0.79,2.2,13,5,10,0
+50,Areeba,31,Male,non-technical,university-admission,AI for O/A Levels,84,0.31,17.7,12,7,10,1
