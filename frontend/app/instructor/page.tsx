@@ -190,7 +190,8 @@ export default function InstructorPage() {
 
   const handleExport = async () => {
     try {
-      const res = await fetch("http://localhost:8002/export-interventions", {
+      const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8002"
+      const res = await fetch(`${API_BASE}/export-interventions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ file_path: filePath || undefined }),
