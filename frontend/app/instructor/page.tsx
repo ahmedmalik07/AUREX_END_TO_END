@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { apiFetch } from "@/lib/config"
 import { motion, AnimatePresence } from "framer-motion"
 import DatasetUploader from "@/components/DatasetUploader"
 import CohortOverview from "@/components/CohortOverview"
@@ -190,7 +191,6 @@ export default function InstructorPage() {
 
   const handleExport = async () => {
     try {
-      const { apiFetch } = await import("@/lib/config")
       const res = await apiFetch("/export-interventions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
