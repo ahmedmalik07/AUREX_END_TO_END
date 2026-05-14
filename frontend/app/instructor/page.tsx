@@ -64,10 +64,10 @@ export default function InstructorPage() {
   const [filePath, setFilePath] = useState<string>("")
   const [activeTab, setActiveTab] = useState<Tab>("overview")
 
-  /* Auth + persistence */
+  /* Auth + persistence (optional — dashboard works without sign-in) */
   const [user, setUser] = useState<any>(null)
   const [cohortId, setCohortId] = useState<string | null>(null)
-  const [loadingCohort, setLoadingCohort] = useState(true)
+  const [loadingCohort, setLoadingCohort] = useState(false)
 
   /* WhatsApp alert state */
   const [alertStudent, setAlertStudent] = useState<StudentPrediction | null>(null)
@@ -88,10 +88,10 @@ export default function InstructorPage() {
   const [attendanceSaved, setAttendanceSaved] = useState(false)
   const [sessionHistory, setSessionHistory] = useState<Array<{ date: string; presentCount: number; total: number }>>([])
 
-  /* Load auth user + their latest cohort on mount */
+  /* Load auth user + their latest cohort on mount (non-blocking) */
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
-      if (!data.user) { setLoadingCohort(false); return }
+      if (!data.user) return
       setUser(data.user)
 
       const { data: cohort } = await supabase
@@ -123,7 +123,6 @@ export default function InstructorPage() {
           })))
         }
       }
-      setLoadingCohort(false)
     })
   }, [])
 
@@ -260,42 +259,6 @@ export default function InstructorPage() {
 
   const topReason = reasonBarData[0]?.reason ?? "N/A"
   const dropoutRate = total > 0 ? Math.round((red / total) * 100) : 0
-
-  if (loadingCohort) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex items-center gap-3 text-ink-400">
-          <BrainCircuit size={20} className="animate-pulse text-brand-400" />
-          <span className="text-sm">Loading instructor data…</span>
-        </div>
-      </div>
-    )
-  }
-
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-6">
-        <div className="max-w-sm w-full text-center space-y-5">
-          <div className="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mx-auto">
-            <AlertTriangle size={28} className="text-rose-400" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-ink-100 mb-2">Sign In Required</h2>
-            <p className="text-sm text-ink-400">
-              The Instructor Intelligence dashboard is restricted to authenticated instructors.
-              Sign in to access your cohort, attendance records, and risk predictions.
-            </p>
-          </div>
-          <button
-            onClick={() => document.dispatchEvent(new CustomEvent("open-auth-modal"))}
-            className="w-full py-3 rounded-xl bg-[#00ED64] hover:bg-[#00c853] text-black font-semibold text-sm transition-colors"
-          >
-            Sign In / Sign Up
-          </button>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 relative">
