@@ -103,24 +103,26 @@ export default function AuthModal({
   return (
     <AnimatePresence>
       {isOpen && (
-        /* Full-viewport overlay — always centered, never scrollable at the wrapper level */
+        /* Full-viewport overlay — scrollable so modal is never clipped above viewport */
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[60] flex items-center justify-center p-4 overflow-hidden"
+          className="fixed inset-0 z-[60] overflow-y-auto"
         >
           {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/75 backdrop-blur-md" onClick={onClose} />
+          <div className="fixed inset-0 bg-black/75 backdrop-blur-md" onClick={onClose} />
 
-          {/* Modal card — internally scrollable so it never clips at top */}
+          {/* Centering wrapper — min-h-full ensures vertical centering via flex */}
+          <div className="flex min-h-full items-center justify-center p-4 py-8">
+
+          {/* Modal card */}
           <motion.div
             initial={{ opacity: 0, scale: 0.93, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.93, y: 20 }}
             transition={{ type: "spring", damping: 24, stiffness: 320 }}
             className="relative w-full max-w-md md:max-w-3xl bg-[#0c0c18] border border-[#00ED64]/20 rounded-2xl md:rounded-3xl shadow-2xl shadow-black/50 flex flex-col md:flex-row overflow-hidden"
-            style={{ maxHeight: "min(90vh, 700px)" }}
           >
             {/* ── Left decorative panel (desktop only) ── */}
             <div className="hidden md:flex md:w-5/12 flex-col justify-between p-8 relative overflow-hidden bg-gradient-to-br from-[#00ED64]/10 via-[#00ED64]/3 to-transparent shrink-0">
@@ -336,6 +338,7 @@ export default function AuthModal({
               </div>
             </div>
           </motion.div>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
