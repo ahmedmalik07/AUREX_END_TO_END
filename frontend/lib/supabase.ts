@@ -29,3 +29,20 @@ export type CourseProgress = {
   total_time_minutes: number
   updated_at?: string
 }
+
+export type Cohort = {
+  id: string
+  instructor_id: string
+  name: string
+  file_path?: string
+  created_at: string
+}
+
+export type AttendanceSession = {
+  id?: string
+  cohort_id: string
+  session_date: string
+  records: Record<string, boolean>
+  present_count: number
+  total: number
+}

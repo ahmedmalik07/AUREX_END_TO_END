@@ -41,10 +41,10 @@ export default function VarkRadar({ scores, dominant }: { scores: VarkScores; do
                 <Radar
                   name="Learning Style"
                   dataKey="A"
-                  stroke="#8b5cf6"
+                  stroke="#00ED64"
                   strokeWidth={3}
-                  fill="#8b5cf6"
-                  fillOpacity={0.25}
+                  fill="#00ED64"
+                  fillOpacity={0.2}
                 />
               </RadarChart>
             </ResponsiveContainer>

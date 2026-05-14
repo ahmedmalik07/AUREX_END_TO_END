@@ -41,7 +41,7 @@
   }
 
   .gradient-text {
-    @apply bg-gradient-to-r from-brand-400 via-accent-400 to-brand-300 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-brand-300 via-brand-400 to-brand-500 bg-clip-text text-transparent;
   }
 
   .gradient-border {
@@ -54,7 +54,7 @@
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(34, 211, 238, 0.2), rgba(139, 92, 246, 0.1));
+    background: linear-gradient(135deg, rgba(0, 237, 100, 0.35), rgba(77, 255, 168, 0.15), rgba(0, 237, 100, 0.06));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;

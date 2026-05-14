@@ -2,13 +2,17 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import Link from "next/link"
 import { Card } from "@/components/ui/Card"
+import CertificateGenerator from "@/components/CertificateGenerator"
+import { COURSE_REGISTRY } from "@/lib/courses"
 import { Button } from "@/components/ui/Button"
 import { Badge } from "@/components/ui/Badge"
 import { Progress } from "@/components/ui/Progress"
 import LessonPlayer from "./LessonPlayer"
 import { WeeklyProgressChart, StatCard } from "./ProgressStats"
 import { supabase } from "@/lib/supabase"
+import confetti from "canvas-confetti"
 import {
   ALL_WEEKS,
   getLessonCount,
@@ -30,13 +34,189 @@ import {
   Zap,
   Play,
   Loader2,
+  Sparkles,
+  GraduationCap,
+  Star,
 } from "lucide-react"
 import { CourseProgress as CourseProgressType, LearningStyle, Week } from "@/types"
 
+/* ── Completion Screen ── */
+function CompletionScreen({
+  totalLessons,
+  completedCount,
+  totalTimeMinutes,
+  learningStyle,
+  studentName,
+  courseName,
+  onBack,
+}: {
+  totalLessons: number
+  completedCount: number
+  totalTimeMinutes: number
+  learningStyle: LearningStyle
+  studentName: string
+  courseName: string
+  onBack: () => void
+}) {
+  const hours = Math.floor(totalTimeMinutes / 60)
+  const mins = totalTimeMinutes % 60
+
+  const achievements = [
+    {
+      icon: Trophy,
+      label: "Course Completer",
+      desc: "Finished all Python lessons",
+      color: "text-amber-400",
+      bg: "bg-amber-500/10",
+      border: "border-amber-500/20",
+      show: true,
+    },
+    {
+      icon: Award,
+      label: "Python Pioneer",
+      desc: "Earned your first AtomCamp certificate",
+      color: "text-brand-400",
+      bg: "bg-brand-500/10",
+      border: "border-brand-500/20",
+      show: true,
+    },
+    {
+      icon: Zap,
+      label: "Quick Learner",
+      desc: "Completed in under 5 hours",
+      color: "text-sky-400",
+      bg: "bg-sky-500/10",
+      border: "border-sky-500/20",
+      show: totalTimeMinutes > 0 && totalTimeMinutes < 300,
+    },
+    {
+      icon: Flame,
+      label: "Deep Diver",
+      desc: "Invested 10+ hours mastering Python",
+      color: "text-rose-400",
+      bg: "bg-rose-500/10",
+      border: "border-rose-500/20",
+      show: totalTimeMinutes >= 600,
+    },
+    {
+      icon: Star,
+      label: "Adaptive Learner",
+      desc: `Mastered content as a ${learningStyle} learner`,
+      color: "text-teal-400",
+      bg: "bg-teal-500/10",
+      border: "border-teal-500/20",
+      show: true,
+    },
+  ].filter((a) => a.show)
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="space-y-8 py-6"
+    >
+      {/* Hero */}
+      <div className="text-center">
+        <motion.div
+          initial={{ scale: 0, rotate: -15 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: "spring", damping: 10, stiffness: 180 }}
+          className="w-24 h-24 rounded-full bg-gradient-to-br from-[#00ED64]/20 to-amber-500/20 border-2 border-[#00ED64]/40 flex items-center justify-center mx-auto mb-6 shadow-[0_0_50px_rgba(0,237,100,0.25)]"
+        >
+          <GraduationCap size={46} className="text-[#00ED64]" />
+        </motion.div>
+        <h1 className="text-4xl font-bold mb-3">
+          <span className="gradient-text">Course Complete!</span>
+        </h1>
+        <p className="text-ink-400 text-lg max-w-md mx-auto">
+          You've mastered <span className="text-brand-300 font-medium">Programming Basics with Python</span>. This is just the beginning.
+        </p>
+      </div>
+
+      {/* Stats row */}
+      <div className="grid sm:grid-cols-3 gap-4">
+        {[
+          { icon: BookOpen,     label: "Lessons",       value: `${completedCount}/${totalLessons}`, color: "text-brand-400" },
+          { icon: Clock,        label: "Time Invested",  value: hours > 0 ? `${hours}h ${mins}m` : `${mins}m`, color: "text-amber-400" },
+          { icon: Sparkles,     label: "Learning Style", value: learningStyle.charAt(0).toUpperCase() + learningStyle.slice(1), color: "text-teal-400" },
+        ].map((stat) => (
+          <Card key={stat.label} className="p-5 text-center">
+            <stat.icon size={20} className={`mx-auto mb-2 ${stat.color}`} />
+            <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
+            <p className="text-xs text-ink-500 mt-1">{stat.label}</p>
+          </Card>
+        ))}
+      </div>
+
+      {/* Achievements */}
+      <div>
+        <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+          <Award size={18} className="text-amber-400" /> Achievements Unlocked
+        </h2>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {achievements.map((a, i) => (
+            <motion.div
+              key={a.label}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 + i * 0.08 }}
+              className={`p-4 rounded-xl border ${a.border} ${a.bg} flex items-center gap-3`}
+            >
+              <div className={`p-2 rounded-lg ${a.bg} ring-1 ${a.border} shrink-0`}>
+                <a.icon size={18} className={a.color} />
+              </div>
+              <div>
+                <p className={`text-sm font-semibold ${a.color}`}>{a.label}</p>
+                <p className="text-xs text-ink-500 leading-snug">{a.desc}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Certificate card */}
+      <Card className="p-6 border-[#00ED64]/20 bg-[#00ED64]/[0.03] relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-48 h-48 bg-[#00ED64]/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative z-10 flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-[#00ED64]/10 border border-[#00ED64]/20 shrink-0">
+              <GraduationCap size={28} className="text-[#00ED64]" />
+            </div>
+            <div>
+              <h3 className="font-bold text-ink-100">Certificate of Completion</h3>
+              <p className="text-sm text-ink-400">{courseName} — AtomCamp</p>
+            </div>
+          </div>
+          <CertificateGenerator
+            studentName={studentName}
+            courseName={courseName}
+            learningStyle={learningStyle}
+          />
+        </div>
+      </Card>
+
+      {/* CTA row */}
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <Button variant="outline" onClick={onBack} className="gap-2">
+          <ChevronRight size={16} className="rotate-180" /> Back to Dashboard
+        </Button>
+        <Link href="/learner">
+          <Button variant="outline" className="gap-2">
+            <Sparkles size={14} /> Explore More Courses
+          </Button>
+        </Link>
+      </div>
+    </motion.div>
+  )
+}
+
+/* ── Main Dashboard ── */
 export default function CourseDashboard({
   learningStyle,
+  courseId = "python-basics",
 }: {
   learningStyle: LearningStyle
+  courseId?: string
 }) {
   const [progress, setProgress] = useState<CourseProgressType>(getDefaultProgress())
   const [selectedLesson, setSelectedLesson] = useState<{
@@ -47,6 +227,7 @@ export default function CourseDashboard({
   const [user, setUser] = useState<any>(null)
   const [saving, setSaving] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [showCompletion, setShowCompletion] = useState(false)
 
   const totalLessons = getLessonCount(ALL_WEEKS)
   const completedCount = getCompletedCount(progress)
@@ -73,7 +254,7 @@ export default function CourseDashboard({
         .from("course_progress")
         .select("*")
         .eq("user_id", userId)
-        .eq("course_id", "python-basics")
+        .eq("course_id", courseId)
         .single()
 
       if (error && error.code !== "PGRST116") {
@@ -103,7 +284,7 @@ export default function CourseDashboard({
     try {
       await supabase.from("course_progress").upsert({
         user_id: user.id,
-        course_id: "python-basics",
+        course_id: courseId,
         completed_lessons: newProgress.completedLessons,
         quiz_scores: newProgress.quizScores,
         total_time_minutes: newProgress.totalTimeMinutes,
@@ -116,12 +297,12 @@ export default function CourseDashboard({
     }
   }
 
-  const handleLessonComplete = (lessonId: string) => {
+  const handleLessonComplete = (lessonId: string, extraMinutes?: number) => {
     if (!progress.completedLessons.includes(lessonId)) {
       const newProgress = {
         ...progress,
         completedLessons: [...progress.completedLessons, lessonId],
-        totalTimeMinutes: progress.totalTimeMinutes + (currentLesson?.duration || 0),
+        totalTimeMinutes: progress.totalTimeMinutes + (extraMinutes ?? currentLesson?.duration ?? 0),
       }
       setProgress(newProgress)
       saveProgress(newProgress)
@@ -160,6 +341,20 @@ export default function CourseDashboard({
         })
       }
     }
+  }
+
+  const handleFinishCourse = () => {
+    if (selectedLesson) {
+      const lesson = ALL_WEEKS[selectedLesson.weekIndex].days[selectedLesson.dayIndex].lessons[selectedLesson.lessonIndex]
+      handleLessonComplete(lesson.id, lesson.duration)
+    }
+    setSelectedLesson(null)
+    setShowCompletion(true)
+    confetti({ particleCount: 180, spread: 100, origin: { y: 0.5 }, colors: ["#00ED64", "#4dffa8", "#ffffff", "#f59e0b"] })
+    setTimeout(() => {
+      confetti({ particleCount: 80, angle: 60, spread: 55, origin: { x: 0 }, colors: ["#00ED64", "#f59e0b"] })
+      confetti({ particleCount: 80, angle: 120, spread: 55, origin: { x: 1 }, colors: ["#00ED64", "#f59e0b"] })
+    }, 300)
   }
 
   const weeklyData = [
@@ -211,7 +406,6 @@ export default function CourseDashboard({
             </div>
           </div>
 
-          {/* Saving indicator */}
           {saving && (
             <div className="flex items-center gap-2 text-xs text-brand-400">
               <Loader2 size={12} className="animate-spin" />
@@ -277,7 +471,17 @@ export default function CourseDashboard({
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-4xl mx-auto p-6">
-          {!selectedLesson ? (
+          {showCompletion ? (
+            <CompletionScreen
+              totalLessons={totalLessons}
+              completedCount={completedCount}
+              totalTimeMinutes={progress.totalTimeMinutes}
+              learningStyle={learningStyle}
+              studentName={user?.user_metadata?.full_name || user?.email || "Student"}
+              courseName={COURSE_REGISTRY[courseId]?.title ?? "Programming Basics with Python"}
+              onBack={() => setShowCompletion(false)}
+            />
+          ) : !selectedLesson ? (
             <div className="space-y-8">
               {/* Welcome Header */}
               <motion.div
@@ -424,10 +628,11 @@ export default function CourseDashboard({
                       ALL_WEEKS[selectedLesson.weekIndex].days[selectedLesson.dayIndex].lessons[
                         selectedLesson.lessonIndex
                       ]
-                    handleLessonComplete(lesson.id)
+                    handleLessonComplete(lesson.id, lesson.duration)
                   }}
                   onNext={() => navigateLesson("next")}
                   onPrev={() => navigateLesson("prev")}
+                  onFinish={handleFinishCourse}
                   hasNext={
                     selectedLesson.lessonIndex + 1 <
                       ALL_WEEKS[selectedLesson.weekIndex].days[selectedLesson.dayIndex].lessons.length ||

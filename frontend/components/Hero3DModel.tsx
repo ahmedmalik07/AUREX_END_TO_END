@@ -5,7 +5,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useGLTF, PresentationControls, Stage, Float, Sparkles, MeshDistortMaterial } from '@react-three/drei'
 import * as THREE from 'three'
 
-const ATOMCAMP_GREEN = "#00E676"
+const ATOMCAMP_GREEN = "#00ED64"
 const ATOMCAMP_DARK = "#01011B"
 
 /* ─── Main Valkyrie Model ─── */
@@ -202,7 +202,7 @@ export default function Hero3DModel() {
             <FloatingShape position={[2.8, -2, -4]} color="#00BFA5" speed={1.0} distort={0.4} geometry="torus" />
             <FloatingShape position={[-1, -2.5, -2]} color={ATOMCAMP_GREEN} speed={0.8} distort={0.35} geometry="box" />
             <FloatingShape position={[3, 2.2, -3.5]} color="#69F0AE" speed={1.4} distort={0.25} geometry="ico" />
-            <FloatingShape position={[-3, -0.5, -5]} color="#00E676" speed={1.1} distort={0.5} geometry="torus" />
+            <FloatingShape position={[-3, -0.5, -5]} color="#00ED64" speed={1.1} distort={0.5} geometry="torus" />
 
             {/* Sparkles in atomcamp green */}
             <Sparkles count={60} scale={10} size={2} speed={0.5} color={ATOMCAMP_GREEN} opacity={0.5} />

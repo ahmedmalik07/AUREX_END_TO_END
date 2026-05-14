@@ -7,6 +7,7 @@ import dynamic from "next/dynamic"
 import CourseCatalog from "@/components/CourseCatalog"
 import CoursePurchase from "@/components/CoursePurchase"
 import { LearningStyle } from "@/types"
+import { supabase } from "@/lib/supabase"
 
 const CourseDashboard = dynamic(() => import("@/components/CourseDashboard"), { ssr: false })
 const ThreeBackground = dynamic(() => import("@/components/ThreeBackground"), { ssr: false })
@@ -19,37 +20,61 @@ function CourseContent() {
 
   const [view, setView] = useState<ViewState>("catalog")
   const [learningStyle, setLearningStyle] = useState<LearningStyle>(styleParam || "visual")
-  const [isPurchased, setIsPurchased] = useState(false)
+  const [selectedCourseId, setSelectedCourseId] = useState("python-basics")
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
-    const saved = localStorage.getItem("course_purchased")
-    if (saved === "true") {
-      setIsPurchased(true)
-      setView("learning")
-    }
+
     const savedStyle = localStorage.getItem("learning_style") as LearningStyle
-    if (savedStyle) {
-      setLearningStyle(savedStyle)
-    } else if (styleParam) {
+    if (savedStyle) setLearningStyle(savedStyle)
+    else if (styleParam) {
       setLearningStyle(styleParam)
       localStorage.setItem("learning_style", styleParam)
     }
+
+    // Check any enrollment in Supabase, go straight to learning
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (data.user) {
+        const { data: progress } = await supabase
+          .from("course_progress")
+          .select("course_id")
+          .eq("user_id", data.user.id)
+          .order("updated_at", { ascending: false })
+          .limit(1)
+          .maybeSingle()
+        if (progress) {
+          setSelectedCourseId(progress.course_id)
+          setView("learning")
+          return
+        }
+      }
+      if (localStorage.getItem("course_purchased") === "true") {
+        setView("learning")
+      }
+    })
   }, [styleParam])
 
-  const handleEnroll = () => {
+  const handleEnroll = (courseId: string) => {
+    setSelectedCourseId(courseId)
     setView("purchase")
   }
 
-  const handlePurchaseComplete = () => {
-    setIsPurchased(true)
-    localStorage.setItem("course_purchased", "true")
+  const handlePurchaseComplete = async () => {
     setView("learning")
-  }
+    localStorage.setItem("course_purchased", "true")
 
-  const handleBackToCatalog = () => {
-    setView("catalog")
+    const { data } = await supabase.auth.getUser()
+    if (data.user) {
+      await supabase.from("course_progress").upsert({
+        user_id: data.user.id,
+        course_id: selectedCourseId,
+        completed_lessons: [],
+        quiz_scores: {},
+        total_time_minutes: 0,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "user_id,course_id" })
+    }
   }
 
   if (!mounted) {
@@ -92,7 +117,7 @@ function CourseContent() {
               <CoursePurchase
                 dominantStyle={learningStyle}
                 onComplete={handlePurchaseComplete}
-                onBack={handleBackToCatalog}
+                onBack={() => setView("catalog")}
               />
             </motion.div>
           )}
@@ -104,7 +129,7 @@ function CourseContent() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <CourseDashboard learningStyle={learningStyle} />
+              <CourseDashboard learningStyle={learningStyle} courseId={selectedCourseId} />
             </motion.div>
           )}
         </AnimatePresence>

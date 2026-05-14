@@ -19,7 +19,7 @@ import {
   PolarRadiusAxis,
 } from "recharts"
 
-const COLORS = ["#8b5cf6", "#22d3ee", "#f472b6", "#fbbf24", "#34d399"]
+const COLORS = ["#00ED64", "#4dffa8", "#1aff8c", "#00c252", "#009940"]
 
 export function WeeklyProgressChart({ data }: { data: { day: string; minutes: number }[] }) {
   return (
@@ -37,7 +37,7 @@ export function WeeklyProgressChart({ data }: { data: { day: string; minutes: nu
               color: "#e2e8f0",
             }}
           />
-          <Bar dataKey="minutes" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="minutes" fill="#00ED64" radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>
@@ -84,7 +84,7 @@ export function SkillRadar({ data }: { data: { skill: string; level: number }[] 
           <PolarGrid stroke="rgba(255,255,255,0.1)" />
           <PolarAngleAxis dataKey="skill" tick={{ fill: "#8585a3", fontSize: 11 }} />
           <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
-          <Radar name="Skills" dataKey="level" stroke="#22d3ee" strokeWidth={2} fill="#22d3ee" fillOpacity={0.2} />
+          <Radar name="Skills" dataKey="level" stroke="#00ED64" strokeWidth={2} fill="#00ED64" fillOpacity={0.2} />
         </RadarChart>
       </ResponsiveContainer>
     </div>

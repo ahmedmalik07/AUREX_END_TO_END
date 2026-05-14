@@ -73,7 +73,7 @@ export default function LearnerPage() {
         particleCount: 120,
         spread: 80,
         origin: { y: 0.6 },
-        colors: ["#8b5cf6", "#22d3ee", "#ffffff"],
+        colors: ["#00ED64", "#4dffa8", "#ffffff"],
       })
       setStep(4)
     }

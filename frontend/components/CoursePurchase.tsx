@@ -46,14 +46,14 @@ export default function CoursePurchase({
         angle: 60,
         spread: 55,
         origin: { x: 0, y: 0.7 },
-        colors: ["#8b5cf6", "#22d3ee", "#f472b6", "#fbbf24"],
+        colors: ["#00ED64", "#4dffa8", "#1aff8c", "#ffffff"],
       })
       confetti({
         particleCount: 3,
         angle: 120,
         spread: 55,
         origin: { x: 1, y: 0.7 },
-        colors: ["#8b5cf6", "#22d3ee", "#f472b6", "#fbbf24"],
+        colors: ["#00ED64", "#4dffa8", "#1aff8c", "#ffffff"],
       })
       if (Date.now() < end) {
         requestAnimationFrame(frame)

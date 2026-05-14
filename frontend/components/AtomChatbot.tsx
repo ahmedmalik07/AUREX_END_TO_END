@@ -66,8 +66,8 @@ function RobotScene({ isTalking }: { isTalking: boolean }) {
     <Canvas camera={{ position: [0, 0, 3], fov: 45 }}>
       <ambientLight intensity={0.8} />
       <directionalLight position={[5, 5, 5]} intensity={1.2} />
-      <pointLight position={[-3, 2, -3]} intensity={0.5} color="#8b5cf6" />
-      <pointLight position={[3, -2, -3]} intensity={0.5} color="#22d3ee" />
+      <pointLight position={[-3, 2, -3]} intensity={0.5} color="#00ED64" />
+      <pointLight position={[3, -2, -3]} intensity={0.5} color="#4dffa8" />
       <Suspense fallback={null}>
         <RobotModel isTalking={isTalking} />
       </Suspense>

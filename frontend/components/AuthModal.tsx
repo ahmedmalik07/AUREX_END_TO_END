@@ -14,6 +14,9 @@ import {
   Sparkles,
   LogOut,
   Zap,
+  CheckCircle2,
+  Eye,
+  EyeOff,
 } from "lucide-react"
 
 export default function AuthModal({
@@ -31,6 +34,26 @@ export default function AuthModal({
   const [fullName, setFullName] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [confirmSent, setConfirmSent] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+
+  useEffect(() => {
+    if (!isOpen) {
+      setError("")
+      setConfirmSent(false)
+      setEmail("")
+      setPassword("")
+      setFullName("")
+      setShowPassword(false)
+    }
+  }, [isOpen])
+
+  /* Trap scroll when open */
+  useEffect(() => {
+    if (isOpen) document.body.style.overflow = "hidden"
+    else document.body.style.overflow = ""
+    return () => { document.body.style.overflow = "" }
+  }, [isOpen])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -42,32 +65,36 @@ export default function AuthModal({
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
-          options: {
-            data: { full_name: fullName },
-          },
+          options: { data: { full_name: fullName } },
         })
         if (error) throw error
 
-        if (data.user) {
-          await supabase.from("profiles").insert({
-            id: data.user.id,
-            email,
-            full_name: fullName,
-          })
+        if (data.session) {
+          try {
+            await supabase.from("profiles").upsert({ id: data.user!.id, email, full_name: fullName })
+          } catch { /* trigger handles this */ }
+          onAuthSuccess(data.user)
+          onClose()
+        } else {
+          setConfirmSent(true)
         }
-
-        onAuthSuccess(data.user)
       } else {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        })
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) throw error
         onAuthSuccess(data.user)
+        onClose()
       }
-      onClose()
     } catch (err: any) {
-      setError(err.message || "Authentication failed")
+      const msg: string = err?.message || "Authentication failed"
+      if (msg.includes("Email not confirmed")) {
+        setError("Please confirm your email first. Check your inbox.")
+      } else if (msg.includes("Invalid login credentials")) {
+        setError("Incorrect email or password. Please try again.")
+      } else if (msg.includes("User already registered")) {
+        setError("Account already exists. Sign in instead.")
+      } else {
+        setError(msg)
+      }
     } finally {
       setLoading(false)
     }
@@ -76,184 +103,237 @@ export default function AuthModal({
   return (
     <AnimatePresence>
       {isOpen && (
+        /* Full-viewport overlay — always centered, never scrollable at the wrapper level */
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[60] flex items-center justify-center p-4"
+          className="fixed inset-0 z-[60] flex items-center justify-center p-4 overflow-hidden"
         >
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={onClose} />
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/75 backdrop-blur-md" onClick={onClose} />
 
+          {/* Modal card — internally scrollable so it never clips at top */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.92, y: 24 }}
+            initial={{ opacity: 0, scale: 0.93, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.92, y: 24 }}
-            transition={{ type: "spring", damping: 22, stiffness: 300 }}
-            className="relative w-full max-w-4xl bg-[#0f0f1a] border border-[#00E676]/20 rounded-3xl shadow-2xl shadow-[#00E676]/10 overflow-hidden flex flex-col md:flex-row"
+            exit={{ opacity: 0, scale: 0.93, y: 20 }}
+            transition={{ type: "spring", damping: 24, stiffness: 320 }}
+            className="relative w-full max-w-md md:max-w-3xl bg-[#0c0c18] border border-[#00ED64]/20 rounded-2xl md:rounded-3xl shadow-2xl shadow-black/50 flex flex-col md:flex-row overflow-hidden"
+            style={{ maxHeight: "min(90vh, 700px)" }}
           >
-            {/* Left panel - branding */}
-            <div className="hidden md:flex md:w-2/5 flex-col justify-between p-8 relative overflow-hidden bg-gradient-to-br from-[#00E676]/10 via-transparent to-[#FBBB2E]/5">
-              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]" />
-              <div className="absolute top-0 left-0 w-full h-full bg-[#00E676]/5 blur-[80px] rounded-full" />
+            {/* ── Left decorative panel (desktop only) ── */}
+            <div className="hidden md:flex md:w-5/12 flex-col justify-between p-8 relative overflow-hidden bg-gradient-to-br from-[#00ED64]/10 via-[#00ED64]/3 to-transparent shrink-0">
+              <div className="absolute inset-0 bg-[#00ED64]/5 blur-[80px] rounded-full pointer-events-none" />
+              <div className="absolute bottom-0 right-0 w-48 h-48 bg-[#009940]/10 rounded-full blur-[60px] pointer-events-none" />
 
               <div className="relative z-10">
-                <div className="flex items-center gap-2 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-[#00E676]/15 border border-[#00E676]/30 flex items-center justify-center">
-                    <Zap size={20} className="text-[#00E676]" />
+                <div className="flex items-center gap-2.5 mb-8">
+                  <div className="w-10 h-10 rounded-xl bg-[#00ED64]/15 border border-[#00ED64]/30 flex items-center justify-center">
+                    <Zap size={20} className="text-[#00ED64]" />
                   </div>
-                  <span className="text-lg font-bold text-white tracking-tight">AtomCamp</span>
+                  <span className="text-xl font-bold text-white tracking-tight">AtomCamp</span>
                 </div>
+
                 <h3 className="text-2xl font-bold text-white mb-3 leading-tight">
-                  {mode === "signin" ? "Welcome Back" : "Start Your Journey"}
+                  {mode === "signin" ? "Welcome Back" : "Start Learning"}
                 </h3>
-                <p className="text-sm text-ink-400 leading-relaxed">
+                <p className="text-sm text-white/50 leading-relaxed">
                   {mode === "signin"
-                    ? "Continue your adaptive learning path powered by AI."
-                    : "Join thousands of learners on Pakistan's most intelligent EdTech platform."}
+                    ? "Resume your AI-powered adaptive learning journey."
+                    : "Join 6,000+ learners on Pakistan's smartest EdTech platform."}
                 </p>
               </div>
 
               <div className="relative z-10 space-y-3">
-                {[
-                  "AI-Personalized Learning Paths",
-                  "Cognitive Profiling (VARK)",
-                  "Offline-First ML Models",
-                ].map((item) => (
-                  <div key={item} className="flex items-center gap-2 text-xs text-ink-300">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#00E676] shadow-[0_0_6px_#00E676]" />
+                {["AI-Personalized Learning Paths", "Cognitive Profiling (VARK)", "Offline-First ML Models"].map((item) => (
+                  <div key={item} className="flex items-center gap-2.5 text-xs text-white/60">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#00ED64] shadow-[0_0_6px_#00ED64] shrink-0" />
                     {item}
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Right panel - form */}
-            <div className="flex-1 p-6 md:p-8 relative">
-              <button
-                onClick={onClose}
-                className="absolute top-4 right-4 p-2 rounded-lg bg-white/5 hover:bg-white/10 text-ink-400 hover:text-white transition-colors"
-              >
-                <X size={16} />
-              </button>
-
-              <div className="text-center mb-6 md:hidden">
-                <div className="w-12 h-12 rounded-xl bg-[#00E676]/10 border border-[#00E676]/20 flex items-center justify-center mx-auto mb-3">
-                  <Sparkles size={24} className="text-[#00E676]" />
-                </div>
-                <h2 className="text-xl font-bold text-white">
-                  {mode === "signin" ? "Welcome Back!" : "Join AtomCamp"}
-                </h2>
-              </div>
-
-              <div className="hidden md:block mb-6">
-                <h2 className="text-xl font-bold text-white">
-                  {mode === "signin" ? "Sign In" : "Create Account"}
-                </h2>
-                <p className="text-sm text-ink-400 mt-1">
-                  {mode === "signin"
-                    ? "Enter your credentials to access your dashboard"
-                    : "Fill in your details to get started"}
-                </p>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {mode === "signup" && (
-                  <div>
-                    <label className="text-xs font-semibold text-ink-300 uppercase tracking-wider mb-1.5 block">
-                      Full Name
-                    </label>
-                    <div className="relative">
-                      <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500" />
-                      <Input
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        placeholder="Zara Khan"
-                        className="pl-10 bg-white/[0.03] border-white/[0.08] focus:border-[#00E676]/50 focus:ring-[#00E676]/20 text-white placeholder:text-ink-600"
-                        required
-                      />
-                    </div>
-                  </div>
-                )}
-
-                <div>
-                  <label className="text-xs font-semibold text-ink-300 uppercase tracking-wider mb-1.5 block">
-                    Email
-                  </label>
-                  <div className="relative">
-                    <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500" />
-                    <Input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="you@example.com"
-                      className="pl-10 bg-white/[0.03] border-white/[0.08] focus:border-[#00E676]/50 focus:ring-[#00E676]/20 text-white placeholder:text-ink-600"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-xs font-semibold text-ink-300 uppercase tracking-wider mb-1.5 block">
-                    Password
-                  </label>
-                  <div className="relative">
-                    <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500" />
-                    <Input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className="pl-10 bg-white/[0.03] border-white/[0.08] focus:border-[#00E676]/50 focus:ring-[#00E676]/20 text-white placeholder:text-ink-600"
-                      required
-                      minLength={6}
-                    />
-                  </div>
-                </div>
-
-                {error && (
-                  <p className="text-sm text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-lg px-3 py-2.5">
-                    {error}
-                  </p>
-                )}
-
-                <Button
-                  type="submit"
-                  className="w-full gap-2 bg-[#00E676] hover:bg-[#00c853] text-black font-semibold shadow-[0_0_20px_rgba(0,230,118,0.25)] hover:shadow-[0_0_28px_rgba(0,230,118,0.4)] transition-all"
-                  disabled={loading}
+            {/* ── Right form panel ── */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="p-6 md:p-8 relative min-h-full flex flex-col">
+                {/* Close button */}
+                <button
+                  onClick={onClose}
+                  className="absolute top-4 right-4 p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-colors z-10"
                 >
-                  {loading ? (
-                    <Loader2 size={16} className="animate-spin" />
-                  ) : mode === "signin" ? (
-                    "Sign In"
-                  ) : (
-                    "Create Account"
-                  )}
-                </Button>
-              </form>
+                  <X size={15} />
+                </button>
 
-              <p className="text-center text-sm text-ink-400 mt-5">
-                {mode === "signin" ? (
-                  <>
-                    Don't have an account?{" "}
-                    <button
-                      onClick={() => { setMode("signup"); setError("") }}
-                      className="text-[#00E676] hover:text-[#00ff88] font-semibold transition-colors"
+                {confirmSent ? (
+                  /* Email confirmation screen */
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-col items-center justify-center flex-1 py-8 text-center"
+                  >
+                    <div className="w-16 h-16 rounded-full bg-[#00ED64]/10 border border-[#00ED64]/20 flex items-center justify-center mb-5">
+                      <CheckCircle2 size={32} className="text-[#00ED64]" />
+                    </div>
+                    <h2 className="text-xl font-bold text-white mb-2">Check Your Inbox</h2>
+                    <p className="text-sm text-white/50 max-w-xs leading-relaxed mb-6">
+                      Confirmation link sent to{" "}
+                      <span className="text-white font-medium">{email}</span>.
+                      Click it to activate your account.
+                    </p>
+                    <Button
+                      onClick={() => { setConfirmSent(false); setMode("signin") }}
+                      className="bg-[#00ED64] hover:bg-[#00c853] text-black font-semibold"
                     >
-                      Sign up
-                    </button>
-                  </>
+                      Go to Sign In
+                    </Button>
+                  </motion.div>
                 ) : (
                   <>
-                    Already have an account?{" "}
-                    <button
-                      onClick={() => { setMode("signin"); setError("") }}
-                      className="text-[#00E676] hover:text-[#00ff88] font-semibold transition-colors"
-                    >
-                      Sign in
-                    </button>
+                    {/* Mobile branding */}
+                    <div className="flex items-center gap-2 mb-6 md:hidden">
+                      <div className="w-9 h-9 rounded-xl bg-[#00ED64]/10 border border-[#00ED64]/20 flex items-center justify-center">
+                        <Sparkles size={16} className="text-[#00ED64]" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-white leading-none">AtomCamp</p>
+                        <p className="text-xs text-white/40">Smart LMS</p>
+                      </div>
+                    </div>
+
+                    {/* Desktop heading */}
+                    <div className="hidden md:block mb-6">
+                      <h2 className="text-xl font-bold text-white">
+                        {mode === "signin" ? "Sign In" : "Create Account"}
+                      </h2>
+                      <p className="text-sm text-white/40 mt-1">
+                        {mode === "signin"
+                          ? "Enter your credentials to continue"
+                          : "Fill in your details to get started"}
+                      </p>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="space-y-4 flex-1">
+                      <AnimatePresence>
+                        {mode === "signup" && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                          >
+                            <label className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-1.5 block">
+                              Full Name
+                            </label>
+                            <div className="relative">
+                              <User size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+                              <Input
+                                value={fullName}
+                                onChange={(e) => setFullName(e.target.value)}
+                                placeholder="Zara Khan"
+                                className="pl-9 h-11 bg-white/[0.04] border-white/[0.08] focus:border-[#00ED64]/50 focus:ring-[#00ED64]/20 text-white placeholder:text-white/20"
+                                required
+                              />
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      <div>
+                        <label className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-1.5 block">
+                          Email
+                        </label>
+                        <div className="relative">
+                          <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+                          <Input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="you@example.com"
+                            className="pl-9 h-11 bg-white/[0.04] border-white/[0.08] focus:border-[#00ED64]/50 focus:ring-[#00ED64]/20 text-white placeholder:text-white/20"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-1.5 block">
+                          Password
+                        </label>
+                        <div className="relative">
+                          <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="••••••••"
+                            className="pl-9 pr-10 h-11 bg-white/[0.04] border-white/[0.08] focus:border-[#00ED64]/50 focus:ring-[#00ED64]/20 text-white placeholder:text-white/20"
+                            required
+                            minLength={6}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
+                          >
+                            {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                          </button>
+                        </div>
+                      </div>
+
+                      {error && (
+                        <motion.p
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="text-sm text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-lg px-3 py-2.5"
+                        >
+                          {error}
+                        </motion.p>
+                      )}
+
+                      <Button
+                        type="submit"
+                        className="w-full h-11 gap-2 bg-[#00ED64] hover:bg-[#00c853] text-black font-semibold text-sm shadow-[0_0_20px_rgba(0,237,100,0.25)] hover:shadow-[0_0_30px_rgba(0,237,100,0.4)] transition-all"
+                        disabled={loading}
+                      >
+                        {loading ? (
+                          <Loader2 size={16} className="animate-spin" />
+                        ) : mode === "signin" ? (
+                          "Sign In"
+                        ) : (
+                          "Create Account"
+                        )}
+                      </Button>
+                    </form>
+
+                    <p className="text-center text-sm text-white/40 mt-5">
+                      {mode === "signin" ? (
+                        <>
+                          Don&apos;t have an account?{" "}
+                          <button
+                            type="button"
+                            onClick={() => { setMode("signup"); setError("") }}
+                            className="text-[#00ED64] hover:text-[#00ff88] font-semibold transition-colors"
+                          >
+                            Sign up
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          Already have an account?{" "}
+                          <button
+                            type="button"
+                            onClick={() => { setMode("signin"); setError("") }}
+                            className="text-[#00ED64] hover:text-[#00ff88] font-semibold transition-colors"
+                          >
+                            Sign in
+                          </button>
+                        </>
+                      )}
+                    </p>
                   </>
                 )}
-              </p>
+              </div>
             </div>
           </motion.div>
         </motion.div>
@@ -270,12 +350,15 @@ export function AuthButton() {
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) setUser(data.user)
     })
-
     const { data: listener } = supabase.auth.onAuthStateChange((_, session) => {
-      setUser(session?.user || null)
+      setUser(session?.user ?? null)
     })
-
-    return () => listener.subscription.unsubscribe()
+    const openHandler = () => setIsOpen(true)
+    document.addEventListener("open-auth-modal", openHandler)
+    return () => {
+      listener.subscription.unsubscribe()
+      document.removeEventListener("open-auth-modal", openHandler)
+    }
   }, [])
 
   const handleSignOut = async () => {
@@ -286,10 +369,10 @@ export function AuthButton() {
   if (user) {
     return (
       <div className="flex items-center gap-2">
-        <span className="text-sm text-ink-300 hidden sm:inline">
+        <span className="text-sm text-white/60 hidden sm:inline max-w-[120px] truncate">
           {user.user_metadata?.full_name || user.email}
         </span>
-        <Button variant="ghost" size="sm" onClick={handleSignOut} className="gap-1">
+        <Button variant="ghost" size="sm" onClick={handleSignOut} className="gap-1 text-white/60 hover:text-white">
           <LogOut size={14} /> Sign Out
         </Button>
       </div>
@@ -301,15 +384,11 @@ export function AuthButton() {
       <Button
         size="sm"
         onClick={() => setIsOpen(true)}
-        className="bg-[#00E676] hover:bg-[#00c853] text-black font-semibold shadow-[0_0_16px_rgba(0,230,118,0.25)]"
+        className="bg-[#00ED64] hover:bg-[#00c853] text-black font-semibold shadow-[0_0_16px_rgba(0,237,100,0.25)]"
       >
         Sign In
       </Button>
-      <AuthModal
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        onAuthSuccess={setUser}
-      />
+      <AuthModal isOpen={isOpen} onClose={() => setIsOpen(false)} onAuthSuccess={setUser} />
     </>
   )
 }

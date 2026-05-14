@@ -19,12 +19,12 @@ export default function MermaidDiagram({ chart }: { chart: string }) {
           startOnLoad: false,
           theme: "dark",
           themeVariables: {
-            primaryColor: "#8b5cf6",
-            primaryTextColor: "#e2e8f0",
-            primaryBorderColor: "#a78bfa",
-            lineColor: "#a78bfa",
-            secondaryColor: "#22d3ee",
-            tertiaryColor: "#1e1e2e",
+            primaryColor: "#00ED64",
+            primaryTextColor: "#020c1b",
+            primaryBorderColor: "#4dffa8",
+            lineColor: "#4dffa8",
+            secondaryColor: "#009940",
+            tertiaryColor: "#0a1628",
             fontFamily: "Inter, sans-serif",
             fontSize: "14px",
           },
@@ -36,7 +36,9 @@ export default function MermaidDiagram({ chart }: { chart: string }) {
         })
 
         const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`
-        const { svg } = await mermaid.render(id, chart.trim())
+        // courseData stores newlines as literal \n — normalise before passing to mermaid
+        const normalized = chart.trim().replace(/\\n/g, "\n")
+        const { svg } = await mermaid.render(id, normalized)
         if (!cancelled) {
           setSvg(svg)
           setError("")

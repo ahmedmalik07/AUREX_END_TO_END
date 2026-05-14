@@ -1,57 +1,34 @@
 "use client"
 
+import { useState } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/Button"
 import { Card } from "@/components/ui/Card"
 import { Badge } from "@/components/ui/Badge"
 import {
-  BookOpen,
-  Clock,
-  Layers,
-  Zap,
-  Star,
-  CheckCircle,
-  ArrowRight,
-  Eye,
-  Ear,
-  BookOpenText,
-  Hand,
-  TrendingUp,
-  Award,
-  Users,
+  Clock, Layers, Zap, Star, CheckCircle, ArrowRight,
+  Eye, Ear, BookOpenText, Hand, TrendingUp, Award, Users, BookOpen,
 } from "lucide-react"
-import {
-  COURSE_TITLE,
-  COURSE_SUBTITLE,
-  COURSE_PRICE,
-  COURSE_DURATION,
-  COURSE_LESSONS,
-  COURSE_HOURS,
-  COURSE_SYLLABUS,
-  COURSE_FEATURES,
-  ADAPTATION_HINTS,
-} from "@/lib/courseData"
+import { ALL_COURSES, COURSE_REGISTRY } from "@/lib/courses"
 import { LearningStyle } from "@/types"
 
 const STYLE_ICONS: Record<LearningStyle, any> = {
-  visual: Eye,
-  auditory: Ear,
-  reading: BookOpenText,
-  kinesthetic: Hand,
+  visual: Eye, auditory: Ear, reading: BookOpenText, kinesthetic: Hand,
 }
-
 const STYLE_COLORS: Record<LearningStyle, string> = {
   visual: "text-purple-400 bg-purple-500/10 border-purple-500/20",
   auditory: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20",
   reading: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
   kinesthetic: "text-amber-400 bg-amber-500/10 border-amber-500/20",
 }
-
 const STYLE_LABELS: Record<LearningStyle, string> = {
-  visual: "Visual Learner",
-  auditory: "Auditory Learner",
-  reading: "Reading Learner",
-  kinesthetic: "Kinesthetic Learner",
+  visual: "Visual Learner", auditory: "Auditory Learner",
+  reading: "Reading Learner", kinesthetic: "Kinesthetic Learner",
+}
+const LEVEL_COLORS: Record<string, string> = {
+  Beginner: "bg-emerald-500/10 text-emerald-300 border-emerald-500/20",
+  Intermediate: "bg-amber-500/10 text-amber-300 border-amber-500/20",
+  Advanced: "bg-rose-500/10 text-rose-300 border-rose-500/20",
 }
 
 export default function CourseCatalog({
@@ -59,194 +36,178 @@ export default function CourseCatalog({
   onEnroll,
 }: {
   dominantStyle: LearningStyle
-  onEnroll: () => void
+  onEnroll: (courseId: string) => void
 }) {
+  const [selectedId, setSelectedId] = useState<string | null>(null)
   const StyleIcon = STYLE_ICONS[dominantStyle]
   const styleColor = STYLE_COLORS[dominantStyle]
-  const adaptationHints = ADAPTATION_HINTS[dominantStyle]
+  const selected = selectedId ? COURSE_REGISTRY[selectedId] : null
 
   return (
     <div className="space-y-10">
-      {/* Hero Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-500/10 via-accent-500/5 to-transparent border border-white/[0.08] p-8 md:p-12"
-      >
-        <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10">
-          <Badge className="mb-4 bg-white/5 border-white/10 text-ink-300">
-            <Zap size={12} className="mr-1 text-brand-400" /> Bestseller
-          </Badge>
-
-          <h1 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
-            <span className="gradient-text">{COURSE_TITLE}</span>
-          </h1>
-          <p className="text-lg text-ink-400 max-w-2xl mb-6">{COURSE_SUBTITLE}</p>
-
-          <div className="flex flex-wrap items-center gap-6 text-sm text-ink-400 mb-8">
-            <div className="flex items-center gap-2">
-              <Star size={16} className="text-amber-400 fill-amber-400" />
-              <span className="font-medium text-ink-200">4.9</span>
-              <span>(2,847 reviews)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Users size={16} className="text-brand-400" />
-              <span>12,500+ enrolled</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Clock size={16} className="text-accent-400" />
-              <span>{COURSE_HOURS}+ hours</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Layers size={16} className="text-rose-400" />
-              <span>{COURSE_LESSONS} lessons</span>
-            </div>
+      {/* Header */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="flex items-center gap-3 mb-3">
+          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border ${styleColor}`}>
+            <StyleIcon size={18} />
+            <span className="text-sm font-semibold">{STYLE_LABELS[dominantStyle]} — courses adapted for you</span>
           </div>
+        </div>
+        <h1 className="text-3xl sm:text-4xl font-bold mb-2">
+          <span className="gradient-text">Choose Your Course</span>
+        </h1>
+        <p className="text-ink-400">All courses use VARK adaptive learning — every lesson delivered in your style.</p>
+      </motion.div>
 
-          {/* Your Learning Style Badge */}
+      {/* Course Cards Grid */}
+      <div className="grid md:grid-cols-3 gap-6">
+        {ALL_COURSES.map((course, i) => (
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 }}
-            className={`inline-flex items-center gap-3 px-5 py-3 rounded-xl border ${styleColor} mb-8`}
+            key={course.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1 }}
           >
-            <StyleIcon size={24} />
-            <div>
-              <p className="text-sm font-medium">Your Learning Style Detected</p>
-              <p className="text-lg font-bold">{STYLE_LABELS[dominantStyle]}</p>
-            </div>
-          </motion.div>
-
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="text-3xl font-bold text-ink-100">
-              PKR {COURSE_PRICE.toLocaleString()}
-              <span className="text-base text-ink-500 font-normal line-through ml-2">PKR 45,000</span>
-            </div>
-            <Button size="lg" className="gap-2 px-8" onClick={onEnroll}>
-              Enroll Now <ArrowRight size={18} />
-            </Button>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Personalized Adaptation */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-      >
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-          <TrendingUp size={20} className="text-brand-400" />
-          Personalized for Your {STYLE_LABELS[dominantStyle]} Brain
-        </h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {adaptationHints.map((hint, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 + i * 0.1 }}
+            <Card
+              className={`p-5 cursor-pointer transition-all hover:border-brand-500/30 flex flex-col h-full ${
+                selectedId === course.id ? "border-brand-500/50 bg-brand-500/[0.04]" : "border-white/[0.08]"
+              }`}
+              onClick={() => setSelectedId(selectedId === course.id ? null : course.id)}
             >
-              <Card className="p-4 h-full border-white/[0.06] hover:border-brand-500/20 transition-all">
-                <div className="flex items-start gap-3">
-                  <div className={`p-2 rounded-lg ${styleColor.split(" ").slice(1).join(" ")}`}>
-                    <CheckCircle size={16} className={styleColor.split(" ")[0]} />
-                  </div>
-                  <p className="text-sm text-ink-300 leading-relaxed">{hint}</p>
-                </div>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
+              <div className="flex items-start justify-between gap-2 mb-3">
+                <span className="text-3xl">{course.icon}</span>
+                <Badge className={`text-xs border ${LEVEL_COLORS[course.level]}`}>{course.level}</Badge>
+              </div>
 
-      {/* What You'll Learn */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-      >
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-          <Award size={20} className="text-accent-400" />
-          What You Will Learn
-        </h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {COURSE_FEATURES.map((feature, i) => (
-            <Card key={i} className="p-4 text-center border-white/[0.06]">
-              <CheckCircle size={20} className="text-brand-400 mx-auto mb-2" />
-              <p className="text-sm font-medium text-ink-200">{feature}</p>
+              <h2 className="font-bold text-ink-100 text-base leading-snug mb-1">{course.title}</h2>
+              <p className="text-xs text-ink-500 leading-relaxed mb-4 flex-1">{course.subtitle}</p>
+
+              <div className="flex items-center gap-3 text-xs text-ink-400 mb-4">
+                <span className="flex items-center gap-1"><Clock size={11} /> {course.duration}</span>
+                <span className="flex items-center gap-1"><Layers size={11} /> {course.lessons} lessons</span>
+                <span className="flex items-center gap-1"><Star size={11} className="text-amber-400" /> 4.9</span>
+              </div>
+
+              <div className="flex flex-wrap gap-1 mb-4">
+                {course.tags.slice(0, 3).map((tag) => (
+                  <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-white/[0.04] text-ink-500 border border-white/[0.06]">{tag}</span>
+                ))}
+              </div>
+
+              <div className="flex items-center justify-between mt-auto">
+                <span className="font-bold text-ink-100">PKR {course.price.toLocaleString()}</span>
+                <Button
+                  size="sm"
+                  onClick={(e) => { e.stopPropagation(); onEnroll(course.id) }}
+                  className="gap-1 text-xs"
+                >
+                  Enroll <ArrowRight size={12} />
+                </Button>
+              </div>
             </Card>
-          ))}
-        </div>
-      </motion.div>
+          </motion.div>
+        ))}
+      </div>
 
-      {/* Syllabus */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-      >
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-          <BookOpen size={20} className="text-brand-400" />
-          Course Curriculum
-        </h2>
-        <div className="space-y-4">
-          {COURSE_SYLLABUS.map((week, i) => (
-            <motion.div
-              key={week.week}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5 + i * 0.1 }}
-            >
-              <Card className="p-5 border-white/[0.06] hover:border-brand-500/20 transition-all">
-                <div className="flex items-start gap-4">
-                  <div className="text-3xl">{week.icon}</div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold text-ink-100">
-                        Week {week.week}: {week.title}
-                      </h3>
-                      <Badge variant="default" className="text-xs">
-                        {week.topics.length} topics
-                      </Badge>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {week.topics.map((topic) => (
-                        <span
-                          key={topic}
-                          className="text-xs px-2.5 py-1 rounded-full bg-white/[0.04] text-ink-400 border border-white/[0.06]"
-                        >
-                          {topic}
-                        </span>
-                      ))}
+      {/* Expanded course detail */}
+      {selected && (
+        <motion.div
+          key={selected.id}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-8"
+        >
+          {/* Hero */}
+          <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${selected.color} border border-white/[0.08] p-8`}>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-4xl">{selected.icon}</span>
+                <Badge className="bg-white/5 border-white/10 text-ink-300">
+                  <Zap size={12} className="mr-1 text-brand-400" /> Bestseller
+                </Badge>
+              </div>
+              <h2 className="text-2xl md:text-3xl font-bold mb-2 gradient-text">{selected.title}</h2>
+              <p className="text-ink-400 max-w-2xl mb-5">{selected.subtitle}</p>
+              <div className="flex flex-wrap items-center gap-5 text-sm text-ink-400 mb-6">
+                <span className="flex items-center gap-1.5"><Star size={14} className="text-amber-400 fill-amber-400" /><span className="text-ink-200 font-medium">4.9</span> (2,400+ reviews)</span>
+                <span className="flex items-center gap-1.5"><Users size={14} className="text-brand-400" />12,500+ enrolled</span>
+                <span className="flex items-center gap-1.5"><Clock size={14} />{selected.hours}+ hours</span>
+                <span className="flex items-center gap-1.5"><Layers size={14} />{selected.lessons} lessons</span>
+              </div>
+              <div className="flex items-center gap-4 flex-wrap">
+                <span className="text-2xl font-bold text-ink-100">
+                  PKR {selected.price.toLocaleString()}
+                  <span className="text-base text-ink-500 font-normal line-through ml-2">PKR {Math.round(selected.price * 1.4).toLocaleString()}</span>
+                </span>
+                <Button size="lg" className="gap-2 px-8" onClick={() => onEnroll(selected.id)}>
+                  Enroll Now <ArrowRight size={18} />
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Adaptation hints */}
+          <div>
+            <h3 className="text-lg font-bold mb-3 flex items-center gap-2">
+              <TrendingUp size={18} className="text-brand-400" />
+              Personalized for {STYLE_LABELS[dominantStyle]}s
+            </h3>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {selected.adaptationHints[dominantStyle].map((hint, i) => (
+                <Card key={i} className="p-4 border-white/[0.06]">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle size={15} className="text-brand-400 mt-0.5 shrink-0" />
+                    <p className="text-sm text-ink-300">{hint}</p>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          {/* Features */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {selected.features.map((f, i) => (
+              <Card key={i} className="p-4 text-center border-white/[0.06]">
+                <CheckCircle size={18} className="text-brand-400 mx-auto mb-2" />
+                <p className="text-sm font-medium text-ink-200">{f}</p>
+              </Card>
+            ))}
+          </div>
+
+          {/* Syllabus */}
+          <div>
+            <h3 className="text-lg font-bold mb-3 flex items-center gap-2">
+              <BookOpen size={18} className="text-brand-400" /> Course Curriculum
+            </h3>
+            <div className="grid sm:grid-cols-2 gap-3">
+              {selected.syllabus.map((week) => (
+                <Card key={week.week} className="p-5 border-white/[0.06] hover:border-brand-500/20 transition-all">
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl">{week.icon}</span>
+                    <div>
+                      <p className="font-semibold text-ink-100 mb-2">Week {week.week}: {week.title}</p>
+                      <div className="flex flex-wrap gap-1">
+                        {week.topics.map((t) => (
+                          <span key={t} className="text-xs px-2 py-0.5 rounded-full bg-white/[0.04] text-ink-400 border border-white/[0.06]">{t}</span>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
+                </Card>
+              ))}
+            </div>
+          </div>
 
-      {/* CTA */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7 }}
-        className="text-center py-8"
-      >
-        <p className="text-ink-400 mb-4">
-          Start your programming journey today — adapted perfectly for how you learn.
-        </p>
-        <Button size="lg" className="gap-2 px-10" onClick={onEnroll}>
-          <Zap size={18} /> Enroll for PKR {COURSE_PRICE.toLocaleString()}
-        </Button>
-        <p className="text-xs text-ink-500 mt-3">30-day money-back guarantee • Lifetime access</p>
-      </motion.div>
+          {/* Bottom CTA */}
+          <div className="text-center py-6">
+            <Button size="lg" className="gap-2 px-12" onClick={() => onEnroll(selected.id)}>
+              <Zap size={18} /> Enroll for PKR {selected.price.toLocaleString()}
+            </Button>
+            <p className="text-xs text-ink-500 mt-3">30-day money-back guarantee · Lifetime access</p>
+          </div>
+        </motion.div>
+      )}
     </div>
   )
 }
